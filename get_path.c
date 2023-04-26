@@ -82,7 +82,7 @@ char **get_path_array(char **env)
 char *find_path(char **path_array, char *command)
 {
 	char *path;
-	int i = 0, path_count = 0, j = 0;
+	int i = 0, j = 0;
 	int dir_length, command_len, tot_length, ok_f = 0, ok_x = 0;
 
 	if (path_array == NULL)
