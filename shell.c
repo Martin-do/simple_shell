@@ -17,7 +17,7 @@ int main(__attribute__((unused))int argc, char **argv, char **env)
 	size_t no_of_bytes = 0;
 	ssize_t read_bytes = 0;
 	char *PROG_NAME = argv[0];
-	char *prompt = "$ ";
+	char *prompt = "==>> ";
 	int errorcount = 0;
 	int exitcode = 0;
 
@@ -32,6 +32,8 @@ int main(__attribute__((unused))int argc, char **argv, char **env)
 		if (input[strlen(input) - 1] == '\n')
 		{
 			if (check_exit(input) != 0)
+				continue;
+			if (blank_check(input) == 1)
 				continue;
 			if (check_env(input) == 1)
 			{

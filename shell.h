@@ -27,6 +27,7 @@ char **command_string_array(char *input, char **path_array, char *PROG_NAME, int
 
 int check_env(char *user_input);
 int check_exit(char *input);
+int blank_check(char *input);
 
 int _strlen(const char *string);
 char *_strdup(char *str);

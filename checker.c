@@ -23,7 +23,18 @@ int check_env(char *user_input)
 	}
 	return (1);
 }
+/**
+ * check_blank - checks if the user did not enter anything
+ * @input: blank user input
+ * Return: 1 if user_input is equal to '\n', 0 otherwise
+*/
+int blank_check(char *input)
+{
+	if (input[0] == '\n')
+		return (1);
 
+	return (0);
+}
 
 /**
  * check_exit - checks if the user inputs the command exit
