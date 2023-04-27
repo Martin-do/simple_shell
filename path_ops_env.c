@@ -31,9 +31,9 @@ int no_of_paths(char *path_arr_env)
 */
 char **get_path_array(char **env)
 {
-	int i = 0, j = 0, count = 0, count2 = 0, p_index = 0, k = 0, path_match = 0;
+	int i = 0, j = 0, count = 0, count2 = 0, p_index = 0, k = 0;
+	int path_match = 0, path_count = 0;
 	char *path_arr_env, *p, **path_array;
-	int path_count = 0;
 
 	while (env[i] != NULL)
 	{
@@ -53,7 +53,7 @@ char **get_path_array(char **env)
 	{
 		if ((*(path_arr_env + count) == '/'))
 		{
-			for (ip_index = 0, count2 = 0; *(path_arr_env + (count + count2)) != ':'
+			for (p_index = 0, count2 = 0; *(path_arr_env + (count + count2)) != ':'
 					&& *(path_arr_env + (count + count2)) != '\0'; count2++)
 			{
 				p[p_index] = *(path_arr_env + (count + count2));
@@ -121,4 +121,21 @@ char *find_path(char **path_array, char *command)
 		free(path);
 	}
 	return (0);
+}
+
+/**
+ * print_env - prints out the environments variables of the system
+ * @env: environment variables
+ */
+void print_env(char **env)
+{
+	int i;
+
+	i = 0;
+	while (env[i] != NULL)
+	{
+		write(STDOUT_FILENO, env[i], _strlen(env[i]));
+		write(STDOUT_FILENO, "\n", 1);
+		i++;
+	}
 }
