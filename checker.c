@@ -24,7 +24,7 @@ int check_env(char *user_input)
 	return (1);
 }
 /**
- * check_blank - checks if the user did not enter anything
+ * blank_check - checks if the user did not enter anything
  * @input: blank user input
  * Return: 1 if user_input is equal to '\n', 0 otherwise
 */
@@ -34,6 +34,21 @@ int blank_check(char *input)
 		return (1);
 
 	return (0);
+}
+
+/**
+ * path_check - checks if command contains path
+ * @command: string to check for slash which denotes path
+ *
+ * Return: 0 if success, -1 if failure
+ */
+
+int path_check(char *command)
+{
+	if (command[0] == '/')
+		return (0);
+
+	return (-1);
 }
 
 /**

@@ -28,10 +28,11 @@ int count_args(char *input)
  * @input: string to parse
  * @path_array: array of directories in PATH
  * @PROG_NAME: name of program
- *
+ * @errorcount: a counter for error numbers
  * Return: an array of arguments
  */
-char **command_string_array(char *input, char **path_array, char *PROG_NAME, int errorcount)
+char **command_string_array(char *input, char **path_array,
+		char *PROG_NAME, int errorcount)
 {
 	int i = 0, j = 0, k = 0, arg_count = 0;
 	char *i_str, **commands, *command_path = NULL;
@@ -53,21 +54,22 @@ char **command_string_array(char *input, char **path_array, char *PROG_NAME, int
 		i_str = calloc(20, 20);
 		k++;
 	}
-	command_path = find_path(path_array, commands[0]);
-	if (command_path == NULL)
+	if (path_check(commands[0]) == -1)
 	{
-		/*free_array(path_array);*/
-		command_error(PROG_NAME, commands[0], errorcount);
-		free(commands);
-		return (NULL);
+		command_path = find_path(path_array, commands[0]);
+		if (command_path == NULL)
+		{
+			command_error(PROG_NAME, commands[0], errorcount);
+			free(commands);
+			return (NULL);
+		}
+		else if (_strcmp("no_access", command_path) == 0)
+		{
+			free(commands);
+			return (NULL);
+		}
+		commands[0] = _strdup(command_path);
 	}
-	else if (_strcmp("no_access", command_path) == 0)
-	{
-		free(commands);
-		/*free_array(path_array);*/
-		return (NULL);
-	}
-	commands[0] = _strdup(command_path);
 	commands[k] = NULL;
 	return (commands);
 }

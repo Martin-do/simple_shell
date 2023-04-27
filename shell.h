@@ -23,11 +23,13 @@ void print_env(char **env);
 void command_error(char *PROG_NAME, char *command, int error_count);
 
 int count_args(char *input);
-char **command_string_array(char *input, char **path_array, char *PROG_NAME, int errorcount);
+char **command_string_array(char *input, char **path_array,
+		char *PROG_NAME, int errorcount);
 
 int check_env(char *user_input);
 int check_exit(char *input);
 int blank_check(char *input);
+int path_check(char *command);
 
 int _strlen(const char *string);
 char *_strdup(char *str);
