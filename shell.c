@@ -17,7 +17,7 @@ int main(__attribute__((unused))int argc, char **argv, char **env)
 	size_t no_of_bytes = 0;
 	ssize_t read_bytes = 0;
 	char *PROG_NAME = argv[0];
-	char *prompt = "==>> ";
+	char *prompt = "";
 	int errorcount = 0;
 	int exitcode = 0;
 
@@ -25,7 +25,7 @@ int main(__attribute__((unused))int argc, char **argv, char **env)
 	while (1)
 	{
 		errorcount++;
-		write(STDOUT_FILENO, prompt, 5);
+		write(STDOUT_FILENO, prompt, 1);
 		read_bytes = getline(&input, &no_of_bytes, stdin);
 		if (read_bytes == -1)
 			exit(exitcode);
