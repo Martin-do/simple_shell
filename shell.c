@@ -9,7 +9,7 @@
  *
  * Return: Always 0.
  */
-int main(__attribute__((unused))int argc, char **argv, char **env)
+int main(__attribute__((unused)) int argc, char **argv, char **env)
 {
 	char *input = NULL;
 	char **commands = NULL;

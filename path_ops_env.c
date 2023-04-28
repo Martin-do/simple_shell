@@ -31,43 +31,44 @@ int no_of_paths(char *path_arr_env)
 */
 char **get_path_array(char **env)
 {
-	int i = 0, j = 0, count = 0, count2 = 0, p_index = 0, k = 0;
-	int path_match = 0, path_count = 0;
-	char *path_arr_env, *p, **path_array;
+	int i = 0, j = 0, count = 0, count2 = 0, p_index = 0, k = 0,
+	    path_match = 1, path_count;
+	char *path_arr_env = NULL, *p, **path_array;
 
 	while (env[i] != NULL)
 	{
 		path_match = strncmp(env[i], "PATH", 4);
 		if (path_match == 0)
-			path_arr_env = strdup(env[i]);
-		i++;
-	}
-	p = malloc(sizeof(char) * 30);
-	if (p == NULL)
-		return (NULL);
-	path_count = no_of_paths(path_arr_env);
-	path_array = malloc(sizeof(char *) * (path_count + 1));
-	if (path_array == NULL)
-		return (NULL);
-	while (path_arr_env[j] != '\0')
-	{
-		if ((*(path_arr_env + count) == '/'))
 		{
-			for (p_index = 0, count2 = 0; *(path_arr_env + (count + count2)) != ':'
-					&& *(path_arr_env + (count + count2)) != '\0'; count2++)
+			path_arr_env = _strdup(env[i]);
+			path_count = no_of_paths(path_arr_env);
+			path_array = malloc(sizeof(char *) * (path_count + 1));
+			if (path_array == NULL)
+				return (NULL);
+			p = malloc(sizeof(char) * 30);
+			if (p == NULL)
+				return (NULL);
+			for (; path_arr_env[j] != '\0'; j++)
 			{
-				p[p_index] = *(path_arr_env + (count + count2));
-				p_index++;
+				if ((*(path_arr_env + count) == '/'))
+				{
+					for (p_index = 0, count2 = 0; *(path_arr_env + (count + count2)) != ':'
+							&& *(path_arr_env + (count + count2)) != '\0'; count2++)
+					{
+						p[p_index] = *(path_arr_env + (count + count2));
+						p_index++;
+					}
+					if (k < path_count)
+						path_array[k] = p;
+					k++;
+					p = calloc(20, 20);
+					count += (p_index - 1);
+					count++;
+				}
+				count++;
 			}
-			if (k < path_count)
-				path_array[k] = p;
-			k++;
-			p = calloc(20, 20);
-			count += (p_index - 1);
-			count++;
 		}
-		j++;
-		count++;
+		i++;
 	}
 	return (path_array);
 }
