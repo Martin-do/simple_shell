@@ -1,19 +1,19 @@
 #include "shell.h"
 
 /**
- * free_array - free an array of strings
- * @array: array to free
+ * bfree - frees a pointer and NULLs the address
+ * @ptr: address of the pointer to free
+ *
+ * Return: 1 if freed, otherwise 0.
  */
-
-void free_array(char **array)
+int bfree(void **ptr)
 {
-	size_t i;
-
-	for (i = 0; array[i] != NULL; i++)
+	if (ptr && *ptr)
 	{
-		free(array[i]);
+		free(*ptr);
+		*ptr = NULL;
+		return (1);
 	}
-
-	free(array);
-
+	return (0);
 }
+

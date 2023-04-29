@@ -1,86 +1,76 @@
 #include "shell.h"
 
 /**
- * _strlen - returns the length of a null-terminated string
- * @str: string
+ * _strlen - returns the length of a string
+ * @s: the string whose length to check
  *
- * Return: length of string, minus null terminator
+ * Return: integer length of string
  */
-
-int _strlen(char *str)
+int _strlen(char *s)
 {
-	int len = 0;
+	int i = 0;
 
-	while (str[len] != '\0')
-		len++;
+	if (!s)
+		return (0);
 
-	return (len);
+	while (*s++)
+		i++;
+	return (i);
 }
 
-
 /**
- * _strcmp - compares two strings
- * @s1: first string
- * @s2: second string
+ * _strcmp - performs lexicogarphic comparison of two strangs.
+ * @s1: the first strang
+ * @s2: the second strang
  *
- * Return: difference of two strings (first minus second) or 0 if equal
+ * Return: negative if s1 < s2, positive if s1 > s2, zero if s1 == s2
  */
-
 int _strcmp(char *s1, char *s2)
 {
-	int index;
-
-	for (index = 0; s1[index] != '\0' && s2[index] != '\0'; index++)
+	while (*s1 && *s2)
 	{
-		if (s1[index] < s2[index])
-			return (s1[index] - s2[index]);
-
-		else if (s1[index] > s2[index])
-			return (s1[index] - s2[index]);
+		if (*s1 != *s2)
+			return (*s1 - *s2);
+		s1++;
+		s2++;
 	}
-
-	return (0);
+	if (*s1 == *s2)
+		return (0);
+	else
+		return (*s1 < *s2 ? -1 : 1);
 }
 
-
 /**
- * _strdup - returns a pointer to a newly allocated space in memory
- * @str: string
- * Return: pointer to newly allocated space in memory
+ * starts_with - checks if needle starts with haystack
+ * @haystack: string to search
+ * @needle: the substring to find
+ *
+ * Return: address of next char of haystack or NULL
  */
-
-char *_strdup(char *str)
+char *starts_with(const char *haystack, const char *needle)
 {
-	int length, i;
-	char *arr;
-
-	length = 0;
-	if (str == NULL)
-		return (NULL);
-
-	length = _strlen(str);
-
-	arr = malloc((length + 1) * sizeof(char));
-	if (arr == NULL)
-		return (NULL);
-
-	for (i = 0; i < length; i++)
-		arr[i] = str[i];
-
-	arr[i] = '\0';
-
-	return (arr);
+	while (*needle)
+		if (*needle++ != *haystack++)
+			return (NULL);
+	return ((char *)haystack);
 }
 
 /**
-* _putchar - prints a single character to stdout
-* @c: The character to print
-*
-* Return: 1 if successful, -1 otherwise
-*/
-
-int _putchar(char c)
+ * _strcat - concatenates two strings
+ * @dest: the destination buffer
+ * @src: the source buffer
+ *
+ * Return: pointer to destination buffer
+ */
+char *_strcat(char *dest, char *src)
 {
-	return (write(STDOUT_FILENO, &c, 1));
+	char *ret = dest;
+
+	while (*dest)
+		dest++;
+	while (*src)
+		*dest++ = *src++;
+	*dest = *src;
+	return (ret);
 }
 

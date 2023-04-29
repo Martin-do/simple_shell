@@ -1,71 +1,86 @@
 #include "shell.h"
 
 /**
- * command_error - prints error message when command is not found
- * @NAME: name of program
- * @command: command not found
+ * _eputs - prints an input string
+ * @str: the string to be printed
  *
+ * Return: Nothing
  */
-
-void command_error(char *NAME, char *command)
+void _eputs(char *str)
 {
-	write(STDERR_FILENO, NAME, _strlen(NAME));
-	write(STDERR_FILENO, ": ", 2);
-	print_number(errorcount);
-	write(STDERR_FILENO, ": ", 2);
-	write(STDERR_FILENO, command, _strlen(command));
-	write(STDERR_FILENO, ": not found\n", 13);
+	int i = 0;
 
-	exitcode = 127;
+	if (!str)
+		return;
+	while (str[i] != '\0')
+	{
+		_eputchar(str[i]);
+		i++;
+	}
 }
 
 /**
- * exec_error - prints error message when command fails to execute
- * @NAME: name of program
- * @command: name of command
+ * _eputchar - writes the character c to stderr
+ * @c: The character to print
+ *
+ * Return: On success 1.
+ * On error, -1 is returned, and errno is set appropriately.
  */
-
-void exec_error(__attribute__((unused))char *NAME, char *command)
+int _eputchar(char c)
 {
-	perror(command);
-	exitcode = 2;
+	static int i;
+	static char buf[WRITE_BUF_SIZE];
+
+	if (c == BUF_FLUSH || i >= WRITE_BUF_SIZE)
+	{
+		write(2, buf, i);
+		i = 0;
+	}
+	if (c != BUF_FLUSH)
+		buf[i++] = c;
+	return (1);
 }
 
 /**
- * access_error - prints error message if user does not have execute privileges
- * @NAME: name of program
- * @command: name of command
+ * _putfd - writes the character c to given fd
+ * @c: The character to print
+ * @fd: The filedescriptor to write to
+ *
+ * Return: On success 1.
+ * On error, -1 is returned, and errno is set appropriately.
  */
-
-void access_error(char *NAME, char *command)
+int _putfd(char c, int fd)
 {
-	write(STDERR_FILENO, NAME, _strlen(NAME));
-	write(STDERR_FILENO, ": ", 2);
-	write(STDERR_FILENO, command, _strlen(command));
-	write(STDERR_FILENO, ": Permission denied\n", 20);
+	static int i;
+	static char buf[WRITE_BUF_SIZE];
 
-
+	if (c == BUF_FLUSH || i >= WRITE_BUF_SIZE)
+	{
+		write(fd, buf, i);
+		i = 0;
+	}
+	if (c != BUF_FLUSH)
+		buf[i++] = c;
+	return (1);
 }
 
-
 /**
- * exit_error - prints message if user inputs an invalid exit status
- * @NAME: name of program
- * @user_input: user input read by program
+ * _putsfd - prints an input string
+ * @str: the string to be printed
+ * @fd: the filedescriptor to write to
+ *
+ * Return: the number of chars put
  */
-
-void exit_error(char *NAME, char *user_input)
+int _putsfd(char *str, int fd)
 {
-	char *token;
+	int i = 0;
 
-	token = strtok(user_input, "\n ");
-	token = strtok(NULL, "\n ");
-
-	write(STDERR_FILENO, NAME, _strlen(NAME));
-	write(STDERR_FILENO, ": ", 2);
-	print_number(errorcount);
-	write(STDERR_FILENO, ": exit: Illegal number: ", 24);
-	write(STDERR_FILENO, token, _strlen(token));
-	write(STDERR_FILENO, "\n", 1);
+	if (!str)
+		return (0);
+	while (*str)
+	{
+		i += _putfd(*str++, fd);
+	}
+	return (i);
 }
 
