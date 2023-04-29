@@ -1,63 +1,14 @@
 #include "shell.h"
 
 /**
- * check_env - checks if command is env
- * @user_input: string to compare to 'env'
+ * exit_check - checks if user input is "exit" and, if so, exits the shell
+ * @user_input: string to compare to "exit"
+ * @NAME: name of program
  *
- * Return: 1 if string is equal to 'env', otherwise 0
+ * Return: 0 if not exit, -1 if exit has an invalid status attached
  */
 
-int check_env(char *user_input)
-{
-	int i = 0;
-	char *command = "env";
-
-	if (_strlen(user_input) != 4)
-		return (0);
-
-	while (command[i] != '\0')
-	{
-		if (command[i] != user_input[i])
-			return (0);
-		i++;
-	}
-	return (1);
-}
-/**
- * blank_check - checks if the user did not enter anything
- * @input: blank user input
- * Return: 1 if user_input is equal to '\n', 0 otherwise
-*/
-int blank_check(char *input)
-{
-	if (input[0] == '\n')
-		return (1);
-
-	return (0);
-}
-
-/**
- * path_check - checks if command contains path
- * @command: string to check for slash which denotes path
- *
- * Return: 0 if success, -1 if failure
- */
-
-int path_check(char *command)
-{
-	if (command[0] == '/')
-		return (0);
-
-	return (-1);
-}
-
-/**
- * check_exit - checks if the user inputs the command exit
- * to exit the shell
- * @user_input: the list of string input from user
- * Return: returns 0 if not exit command and -1 if status not valid
-*/
-int check_exit(char *user_input)
+int exit_check(char *user_input, char *NAME)
 {
 	int i, j, length, size, status;
 	char *number;
@@ -87,14 +38,71 @@ int check_exit(char *user_input)
 			}
 			else
 			{
+				exit_error(NAME, user_input);
 				free(number);
+				exitcode = 2;
 				return (-1);
 			}
 		}
 		number[j] = '\0';
-		status = atoi(number);
+		status = _atoi(number);
 		free(number);
 	}
 	free(user_input);
 	exit(status);
 }
+
+/**
+ * blank_check - checks if user input is just a return
+ * @user_input: string to compare to "\n"
+ *
+ * Return: 1 if user_input is equal to '\n', 0 otherwise
+ */
+
+int blank_check(char *user_input)
+{
+	if (user_input[0] == '\n')
+		return (1);
+
+	return (0);
+}
+
+/**
+ * path_check - checks if command contains path
+ * @command: string to check for slash which denotes path
+ *
+ * Return: 0 if success, -1 if failure
+ */
+
+int path_check(char *command)
+{
+	if (command[0] == '/')
+		return (0);
+
+	return (-1);
+}
+
+/**
+ * env_check - checks if command is env
+ * @user_input: string to compare to 'env'
+ *
+ * Return: 1 if string is equal to 'env', otherwise 0
+ */
+
+int env_check(char *user_input)
+{
+	int i = 0;
+	char *env = "env";
+
+	if (_strlen(user_input) != 4)
+		return (0);
+
+	while (env[i] != '\0')
+	{
+		if (env[i] != user_input[i])
+			return (0);
+		i++;
+	}
+	return (1);
+}
+

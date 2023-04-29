@@ -1,75 +1,76 @@
 #include "shell.h"
 
 /**
- * no_of_paths - counts the number of paths
- * @path_arr_env: the lists of paths
- * Return: returns the number of paths in the lists
-*/
-int no_of_paths(char *path_arr_env)
-{
-	int count = 0, path = 0, num = 0;
+ * get_path_count - counts number of directories in PATH
+ * @path: PATH string
+ *
+ * Return: number of directories
+ */
 
-	for (; *(path_arr_env + count) != '\0'; count++)
+int get_path_count(char *path)
+{
+	int i, count;
+
+	i = 0;
+	count = 0;
+	while (path[i] != '\0')
 	{
-		if (*(path_arr_env + count) == '/')
-		{
-			for (; *(path_arr_env + (count + path)) != ':'
-					&& *(path_arr_env + (count + path)) != '\0'; path++)
-				continue;
-			num++;
-			count += path;
-			path = 0;
-		}
+		if (path[i] == '=' || path[i] == ':')
+			count++;
+		i++;
 	}
-	return (num);
+
+	return (count);
 }
 
 /**
- * get_path_array - gets the individual paths from the lists
- * @env: the list of environments variables
- * Return: returns the array of paths
-*/
+ * get_path_array - creates an array of PATH directories
+ * @env: user environment
+ *
+ * Return: array of strings
+ */
+
 char **get_path_array(char **env)
 {
-	int i = 0, j = 0, count = 0, count2 = 0, p_index = 0, k = 0,
-	    path_match = 1, path_count;
-	char *path_arr_env = NULL, *p, **path_array;
+	unsigned int i, j, path_count;
+	int compare = 0;
+	char *token, *token2,  *mypath;
+	char **path_array;
 
+	i = 0;
+	j = 0;
 	while (env[i] != NULL)
 	{
-		path_match = strncmp(env[i], "PATH", 4);
-		if (path_match == 0)
+		compare = _strcmp(env[i], "PATH");
+		if (compare == 0)
 		{
-			path_arr_env = _strdup(env[i]);
-			path_count = no_of_paths(path_arr_env);
+			mypath = _strdup(env[i]);
+			path_count = get_path_count(mypath);
+			token = strtok(mypath, "=");
+			token = strtok(NULL, "=");
 			path_array = malloc(sizeof(char *) * (path_count + 1));
 			if (path_array == NULL)
 				return (NULL);
-			p = malloc(sizeof(char) * 30);
-			if (p == NULL)
-				return (NULL);
-			for (; path_arr_env[j] != '\0'; j++)
+			if (token[0] == ':')
 			{
-				if ((*(path_arr_env + count) == '/'))
-				{
-					for (p_index = 0, count2 = 0; *(path_arr_env + (count + count2)) != ':'
-							&& *(path_arr_env + (count + count2)) != '\0'; count2++)
-					{
-						p[p_index] = *(path_arr_env + (count + count2));
-						p_index++;
-					}
-					if (k < path_count)
-						path_array[k] = p;
-					k++;
-					p = calloc(20, 20);
-					count += (p_index - 1);
-					count++;
-				}
-				count++;
+				path_array[j] = _strdup("./");
+				j++;
+				token2 = strtok(token, ":");
+				token2 = strtok(NULL, ":");
+			}
+			else
+				token2 = strtok(token, ":");
+			while (j < path_count)
+			{
+				path_array[j] = _strdup(token2);
+				j++;
+				token2 = strtok(NULL, ":");
 			}
 		}
 		i++;
 	}
+	path_array[path_count] = NULL;
+	free(mypath);
 	return (path_array);
 }
 
@@ -80,36 +81,37 @@ char **get_path_array(char **env)
  *
  * Return: path of command, NULL if it fails
  */
+
 char *find_path(char **path_array, char *command)
 {
+	int i, j, ok_f = 0, ok_x = 0, dir_len, com_len, total_len;
 	char *path;
-	int i = 0, j = 0;
-	int dir_length, command_len, tot_length, ok_f = 0, ok_x = 0;
 
-	if (path_array == NULL)
-		return (NULL);
 	for (i = 0; path_array[i] != NULL; i++)
 	{
-		dir_length = _strlen(path_array[i]);
-		command_len = _strlen(command);
-		tot_length = dir_length + command_len;
-		path = malloc(sizeof(char) * (tot_length + 2));
+		dir_len = _strlen(path_array[i]);
+		com_len = _strlen(command);
+		total_len = dir_len + com_len;
+		path = malloc(sizeof(char) * (total_len + 2));
 		if (path == NULL)
+		{
+			free_array(path_array);
 			return (NULL);
+		}
 		j = 0;
-		while (j < dir_length)
+		while (j < dir_len)
 		{
 			path[j] = path_array[i][j];
 			j++;
 		}
 		path[j] = '/';
 		j = 0;
-		while (j < command_len)
+		while (j < com_len)
 		{
-			path[dir_length + j + 1] = command[j];
+			path[dir_len + j + 1] = command[j];
 			j++;
 		}
-		path[tot_length + 1] = '\0';
+		path[total_len + 1] = '\0';
 		ok_f = access(path, F_OK);
 		ok_x = access(path, X_OK);
 		if (ok_f == 0)
@@ -121,13 +123,14 @@ char *find_path(char **path_array, char *command)
 		}
 		free(path);
 	}
-	return (0);
+	return (NULL);
 }
 
 /**
- * print_env - prints out the environments variables of the system
- * @env: environment variables
+ * print_env - print environment variables
+ * @env: array of environment variables
  */
+
 void print_env(char **env)
 {
 	int i;
@@ -140,3 +143,4 @@ void print_env(char **env)
 		i++;
 	}
 }
+

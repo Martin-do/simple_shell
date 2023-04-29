@@ -1,77 +1,82 @@
 #include "shell.h"
 
-
 /**
- * count_args - counts the number of arguments
- * @input: the string to be counted
- * Return: returns the number of arguments
-*/
-int count_args(char *input)
-{
-	int i = 0, num = 0;
+ * arg_counter - count the number of arguments
+ * @user_input: string of user input
+ *
+ * Return: number of arguments
+ */
 
-	for (; *(input + i) != '\0' && *(input + i) != '\n'; i++)
+int arg_counter(char *user_input)
+{
+	int i, args, start;
+
+	args = 1;
+	i = 0;
+	start = 0;
+	while (user_input[i] != '\0' && user_input[i] != '\n')
 	{
-		if (*(input + i) == ' ' && *(input + (i + 1)) != '\n')
-		{
-			num++;
-		}
+		if (user_input[i] != ' ')
+			start = 1;
+		if (user_input[i] == ' ' && user_input[i + 1] != ' '
+		    && user_input[i + 1] != '\n' && start == 1)
+			args++;
+		i++;
 	}
-	num += 1;
-	return (num);
+	return (args);
 }
 
-
-
 /**
- * command_string_array - parses input to create an array of strings
- * @input: string to parse
+ * parse_input - parses user_input to create an array of strings
+ * @user_input: string to tokenize
  * @path_array: array of directories in PATH
- * @PROG_NAME: name of program
- * @errorcount: a counter for error numbers
+ * @NAME: name of program
+ *
  * Return: an array of arguments
  */
-char **command_string_array(char *input, char **path_array,
-		char *PROG_NAME, int errorcount)
-{
-	int i = 0, j = 0, k = 0, arg_count = 0;
-	char *i_str, **commands, *command_path = NULL;
 
-	i_str = malloc(sizeof(char) * 30);
-	if (i_str == NULL)
-		return (NULL);
-	arg_count = count_args(input);
-	commands = malloc(sizeof(char *) * (arg_count + 1));
+char **parse_input(char *user_input, char **path_array, char *NAME)
+{
+	char **commands, *token, *dir_path = NULL;
+	int args = 1, i = 0;
+
+	args = arg_counter(user_input);
+	commands = malloc(sizeof(char *) * (args + 1));
 	if (commands == NULL)
+	{
+		free_array(path_array);
 		return (NULL);
-	for (i = 0; input[i] != '\0' && input[i] != '\n'; i++)
-	{
-		for (j = 0; input[i + j] != ' ' && input[i + j] != '\n'; j++)
-			i_str[j] = input[i + j];
-		i += j;
-		if (k < arg_count)
-			commands[k] = i_str;
-		i_str = calloc(20, 20);
-		k++;
 	}
-	if (path_check(commands[0]) == -1)
+	token = strtok(user_input, "\n ");
+	if (path_check(token) == -1)
 	{
-		command_path = find_path(path_array, commands[0]);
-		if (command_path == NULL)
-		{
-			command_error(PROG_NAME, commands[0], errorcount);
-			free(commands);
-			return (NULL);
-		}
-		else if (_strcmp("no_access", command_path) == 0)
+		dir_path = find_path(path_array, token);
+		if (dir_path == NULL)
 		{
 			free(commands);
+			free_array(path_array);
+			command_error(NAME, token);
+			exitcode = 127;
 			return (NULL);
 		}
-		commands[0] = _strdup(command_path);
+		else if (_strcmp("no_access", dir_path) == 0)
+		{
+			free(commands);
+			free_array(path_array);
+			access_error(NAME, token);
+			exitcode = 126;
+			return (NULL);
+		}
+		commands[0] = _strdup(dir_path);
+		free(dir_path);
 	}
-	commands[k] = NULL;
+	else
+		commands[0] = _strdup(token);
+	for (i = 1; i < args; i++)
+	{
+		token = strtok(0, "\n ");
+		commands[i] = _strdup(token);
+	}
+	commands[i] = NULL;
 	return (commands);
 }
-
-

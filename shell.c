@@ -1,51 +1,65 @@
 #include "shell.h"
 
+int exitcode = 0;
+int errorcount = 0;
+
 /**
- * main - Entry point for the shell program
+ * main - a simple shell program written in C
+ * @argc: number of arguments
+ * @argv: array of arguments
+ * @env: array of environment variables
  *
- * @argc: The number of command-line arguments
- * @argv: An array of command-line argument strings
- * @env: An array of environment variable strings
- *
- * Return: Always 0.
+ * Return: 0 always (but program may exit early)
  */
+
 int main(__attribute__((unused)) int argc, char **argv, char **env)
 {
-	char *input = NULL;
+	char *user_input = NULL;
 	char **commands = NULL;
 	char **path_array = NULL;
-	size_t no_of_bytes = 0;
-	ssize_t read_bytes = 0;
-	char *PROG_NAME = argv[0];
-	char *prompt = "";
-	int errorcount = 0;
-	int exitcode = 0;
+	size_t nbytes = 0;
+	ssize_t bytes_read = 0;
+	char *NAME = argv[0];
+	int atty_is = isatty(0);
+	
+
+	/*int c = 0;*/
 
 	signal(SIGINT, SIG_IGN);
+
 	while (1)
 	{
 		errorcount++;
-		write(STDOUT_FILENO, prompt, 1);
-		read_bytes = getline(&input, &no_of_bytes, stdin);
-		if (read_bytes == -1)
-			exit(exitcode);
-		if (input[strlen(input) - 1] == '\n')
+		if (atty_is)
+			write(STDOUT_FILENO, "=>$ ", 4);
+		bytes_read = getline(&user_input, &nbytes, stdin);
+		if (bytes_read == -1)
 		{
-			if (check_exit(input) != 0)
-				continue;
-			if (blank_check(input) == 1)
-				continue;
-			if (check_env(input) == 1)
-			{
-				print_env(env);
-				continue;
-			}
-			path_array = get_path_array(env);
-			commands = command_string_array(input, path_array, PROG_NAME, errorcount);
-			if (commands != NULL)
-				exec_command(commands, env, PROG_NAME);
+			free(user_input);
+			exit(exitcode);
+		}
+		if (exit_check(user_input, NAME) == -1)
+			continue;
+		if (blank_check(user_input) == 1)
+			continue;
+		if (env_check(user_input) == 1)
+		{
+			print_env(env);
+			continue;
+		}
+		path_array = get_path_array(env);
+		commands = parse_input(user_input, path_array, NAME);
 
+		/*for (; commands[c] != NULL; c++)
+			printf("the commands are: %s\n", commands[c]);*/
+		
+		if (commands != NULL)
+		{
+			fork_wait_exec(commands, path_array, env, NAME, user_input);
+			free_array(commands);
+			free_array(path_array);
 		}
 	}
 	return (0);
 }
+
