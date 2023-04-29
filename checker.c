@@ -68,6 +68,21 @@ int blank_check(char *user_input)
 }
 
 /**
+ * empty_input - checks if user input empty
+ * @user_input: string to compare to "\n"
+ *
+ * Return: 1 if user_input is equal to '\n', 0 otherwise
+ */
+
+int empty_input(char *user_input)
+{
+	if (user_input[0] == ' ')
+		return (1);
+
+	return (0);
+}
+
+/**
  * path_check - checks if command contains path
  * @command: string to check for slash which denotes path
  *

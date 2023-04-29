@@ -42,6 +42,8 @@ int main(__attribute__((unused)) int argc, char **argv, char **env)
 			continue;
 		if (blank_check(user_input) == 1)
 			continue;
+		if (empty_input(user_input) == 1)
+			continue;
 		if (env_check(user_input) == 1)
 		{
 			print_env(env);
